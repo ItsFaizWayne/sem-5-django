@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}My Rentals{% endblock %}
+
+{% block content %}
+<h2>My Rental Requests</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Game</th>
+            <th>Status</th>
+            <th>Requested At</th>
+            <th>Approved At</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for rental in rentals %}
+        <tr>
+            <td>{{ rental.game.title }}</td>
+            <td>{{ rental.get_status_display }}</td>
+            <td>{{ rental.requested_at }}</td>
+            <td>{{ rental.approved_at|default:"-" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">No rentals requested yet.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

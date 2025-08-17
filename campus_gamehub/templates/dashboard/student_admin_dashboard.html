@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% block title %}Student Admin Dashboard{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Student Admin Dashboard</h2>
+
+<!-- Games You Added -->
+<div class="card mb-4 shadow-sm">
+    <div class="card-header bg-dark text-white">Games You Added</div>
+    <div class="card-body">
+        <ul class="list-group">
+            {% for game in games %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ game.title }}
+                {% if game.available %}
+                    <span class="badge bg-success">Available</span>
+                {% else %}
+                    <span class="badge bg-danger">Not Available</span>
+                {% endif %}
+            </li>
+            {% empty %}
+            <li class="list-group-item">No games added yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<!-- Rental Requests You Manage -->
+<div class="card shadow-sm">
+    <div class="card-header bg-dark text-white">Rental Requests You Manage</div>
+    <div class="card-body">
+        <table class="table table-bordered table-hover">
+            <thead class="table-secondary">
+                <tr>
+                    <th>User</th>
+                    <th>Game</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rental in rentals %}
+                <tr>
+                    <td>{{ rental.user.username }}</td>
+                    <td>{{ rental.game.title }}</td>
+                    <td>
+                        {% if rental.status|lower == 'pending' %}
+                            <span class="badge bg-warning text-dark">Pending</span>
+                        {% elif rental.status|lower == 'approved' %}
+                            <span class="badge bg-success">Approved</span>
+                        {% elif rental.status|lower == 'rejected' %}
+                            <span class="badge bg-danger">Rejected</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ rental.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if rental.status|lower == 'pending' %}
+                            <form action="{% url 'update_rental_status' rental.id 'Approved' %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm me-1">Approve</button>
+                            </form>
+                            <form action="{% url 'update_rental_status' rental.id 'Rejected' %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                            </form>
+                        {% else %}
+                            <span class="badge bg-secondary">No Action</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">No rental requests found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+
+
+
+
+
+{% comment %} {% extends 'base.html' %}
+{% block title %}Student Admin Dashboard{% endblock %}
+{% block content %}
+<h2 class="mb-4">Student Admin Dashboard</h2>
+
+<div class="card mb-4">
+    <div class="card-header">Games You Added</div>
+    <div class="card-body">
+        <ul class="list-group">
+            {% for game in games %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ game.title }}
+                {% if game.available %}
+                    <span class="badge bg-success">Available</span>
+                {% else %}
+                    <span class="badge bg-danger">Not Available</span>
+                {% endif %}
+            </li>
+            {% empty %}
+            <li class="list-group-item">No games added yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">Rental Requests You Manage</div>
+    <div class="card-body">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Game</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rental in rentals %}
+                <tr>
+                    <td>{{ rental.user.username }}</td>
+                    <td>{{ rental.game.title }}</td>
+                    <td>
+                        {% if rental.status|lower == 'pending' %}
+                            <span class="badge bg-warning text-dark">Pending</span>
+                        {% elif rental.status|lower == 'approved' %}
+                            <span class="badge bg-success">Approved</span>
+                        {% elif rental.status|lower == 'rejected' %}
+                            <span class="badge bg-danger">Rejected</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ rental.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if rental.status|lower == 'pending' %}
+                            <form action="{% url 'update_rental_status' rental.id 'Approved' %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                            </form>
+                            <form action="{% url 'update_rental_status' rental.id 'Rejected' %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                            </form>
+                        {% else %}
+                            <span class="badge bg-secondary">No Action</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">No rental requests found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %} {% endcomment %}

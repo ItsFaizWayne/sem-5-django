@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+{% block title %}Super Admin Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard-hero {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .dashboard-hero h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        color: #00ffcc;
+        text-shadow: 0 0 10px #00ffcc, 0 0 20px #009988;
+    }
+    .dashboard-hero p {
+        color: #aaa;
+        font-size: 1.2rem;
+    }
+
+    .summary-card {
+        background: #1c1c1c;
+        border: 2px solid #333;
+        border-radius: 12px;
+        padding: 20px;
+        transition: 0.3s;
+        text-align: center;
+    }
+    .summary-card:hover {
+        border-color: #00ffcc;
+        box-shadow: 0 0 15px #00ffcc;
+        transform: translateY(-5px);
+    }
+    .summary-card h5 {
+        color: #00ffcc;
+        font-weight: bold;
+    }
+    .summary-card p {
+        font-size: 2rem;
+        color: #fff;
+        margin: 0;
+    }
+
+    .rental-table th, .rental-table td {
+        vertical-align: middle;
+    }
+
+    .btn-neon {
+        position: relative;
+        display: inline-block;
+        padding: 8px 18px;
+        border: 2px solid #00ffcc;
+        color: #00ffcc;
+        font-weight: bold;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: 0.2s;
+        background: transparent;
+        font-size: 0.9rem;
+    }
+    .btn-neon:hover {
+        background: #00ffcc;
+        color: #000;
+        box-shadow: 0 0 15px #00ffcc, 0 0 40px #00ffcc;
+    }
+</style>
+
+<div class="dashboard-hero">
+    <h1>🎮 Super Admin Dashboard</h1>
+    <p>Manage users, games, and rentals efficiently with style.</p>
+</div>
+
+<div class="text-center mb-4">
+    <a href="{% url 'admin:index' %}" class="btn-neon">🛠️ Go to Admin Panel</a>
+</div>
+
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="summary-card">
+            <h5>Total Users</h5>
+            <p>{{ users.count }}</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="summary-card">
+            <h5>Total Games</h5>
+            <p>{{ games.count }}</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="summary-card">
+            <h5>Total Rentals</h5>
+            <p>{{ rentals.count }}</p>
+        </div>
+    </div>
+</div>
+
+<h4 class="mb-3">Recent Rentals</h4>
+<table class="table table-striped table-hover rental-table">
+    <thead class="table-dark">
+        <tr>
+            <th>User</th>
+            <th>Game</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for rental in rentals|slice:":5" %}
+        <tr>
+            <td>{{ rental.user.username }}</td>
+            <td>{{ rental.game.title }}</td>
+            <td>
+                {% if rental.status|lower == 'pending' %}
+                    <span class="badge bg-warning text-dark">Pending</span>
+                {% elif rental.status|lower == 'approved' %}
+                    <span class="badge bg-success">Approved</span>
+                {% elif rental.status|lower == 'rejected' %}
+                    <span class="badge bg-danger">Rejected</span>
+                {% else %}
+                    <span class="badge bg-secondary">{{ rental.status }}</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if rental.status|lower == 'pending' %}
+                    <form action="{% url 'update_rental_status' rental.id 'Approved' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-neon">Approve</button>
+                    </form>
+                    <form action="{% url 'update_rental_status' rental.id 'Rejected' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-neon">Reject</button>
+                    </form>
+                {% else %}
+                    <span class="badge bg-secondary">No Action</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4" class="text-center">No recent rentals available.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+
+
+
+{% comment %} {% extends 'base.html' %}
+{% block title %}Super Admin Dashboard{% endblock %}
+{% block content %}
+<h2 class="mb-4">Super Admin Dashboard</h2>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card text-bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Total Users</h5>
+                <p class="display-6">{{ users.count }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Total Games</h5>
+                <p class="display-6">{{ games.count }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-bg-warning mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Total Rentals</h5>
+                <p class="display-6">{{ rentals.count }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="mt-4">Recent Rentals</h4>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Game</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for rental in rentals|slice:":5" %}
+        <tr>
+            <td>{{ rental.user.username }}</td>
+            <td>{{ rental.game.title }}</td>
+            <td>
+                {% if rental.status|lower == 'pending' %}
+                    <span class="badge bg-warning text-dark">Pending</span>
+                {% elif rental.status|lower == 'approved' %}
+                    <span class="badge bg-success">Approved</span>
+                {% elif rental.status|lower == 'rejected' %}
+                    <span class="badge bg-danger">Rejected</span>
+                {% else %}
+                    <span class="badge bg-secondary">{{ rental.status }}</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if rental.status|lower == 'pending' %}
+                    <form action="{% url 'update_rental_status' rental.id 'Approved' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                    </form>
+                    <form action="{% url 'update_rental_status' rental.id 'Rejected' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                    </form>
+                {% else %}
+                    <span class="badge bg-secondary">No Action</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}  {% endcomment %}

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Student Dashboard{% endblock %}
+{% block content %}
+<h2 class="mb-4">Student Dashboard</h2>
+
+<div class="card mb-4">
+    <div class="card-header">Available Games</div>
+    <div class="card-body">
+        <div class="row">
+            {% for game in games %}
+            <div class="col-md-4">
+                <div class="card mb-3">
+                    {% if game.image %}
+                    <img src="{{ game.image.url }}" class="card-img-top" alt="{{ game.title }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ game.title }}</h5>
+                        <p class="card-text">{{ game.description|truncatechars:80 }}</p>
+                        {% if game.available %}
+                            <a href="{% url 'request_rental' game.id %}" class="btn btn-success">Rent</a>
+                        {% else %}
+                            <button class="btn btn-secondary" disabled>Not Available</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p>No games available right now.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">Your Rentals</div>
+    <div class="card-body">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Game</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rental in rentals %}
+                <tr>
+                    <td>{{ rental.game.title }}</td>
+                    <td>{{ rental.status }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2">You have no rentals yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %} 
